@@ -12,13 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class SeleccionTramite extends AppCompatActivity {
 
 
-    public static TreeMap<Bundle, TreeMap<String,Integer>> getTramites(){
-        TreeMap<Bundle,TreeMap<String,Integer>> treefinal=new TreeMap<>();
+    public static HashMap<Bundle, TreeMap<String,Integer>> getTramites(){
+        HashMap<Bundle,TreeMap<String,Integer>> treefinal=new HashMap<>();
         Bundle bundle=new Bundle();
         TreeMap<String,Integer> tree=new TreeMap<>();
 
@@ -45,27 +46,73 @@ public class SeleccionTramite extends AppCompatActivity {
         return treefinal;
     }
 
+    public static TreeMap<String, ArrayList<String>> getTramitesInstitucion() {
+        TreeMap<String, ArrayList<String>> tree = new TreeMap<>();
+        HashMap<Bundle, TreeMap<String, Integer>> tr = getTramites();
+
+        for (Bundle b : tr.keySet()) {
+            ArrayList<String> b1 = (ArrayList<String>) b.get("bancos");
+            ArrayList<String> tramitesBancos = new ArrayList<>();
+            tramitesBancos.add("Crear cuenta");
+            tramitesBancos.add("Generar clave");
+            tramitesBancos.add("Solicitar préstamo");
+            for (String s : b1) {
+                tree.put(s, tramitesBancos);
+            }
+
+            ArrayList<String> b2 = (ArrayList<String>) b.get("hospitales");
+            ArrayList<String> tramitesMedicos = new ArrayList<>();
+            tramitesMedicos.add("Separar consulta");
+            tramitesMedicos.add("Separar cita");
+            tramitesMedicos.add("Revisión examen");
+            for (String s : b2) {
+                tree.put(s, tramitesMedicos);
+            }
+            ArrayList<String> b3 = (ArrayList<String>) b.get("legales");
+            ArrayList<String> tramitesLegales = new ArrayList<>();
+            tramitesLegales.add("Generación de testamento");
+            tramitesLegales.add("Contratos");
+            tramitesLegales.add("Documentos notarizados");
+        for (String s : b3) {
+            tree.put(s, tramitesLegales);
+            }
+        }
+        return tree;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_seleccion_institucion);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        TreeMap<Bundle ,TreeMap<String,Integer>> tree=getTramites();
-        final Bundle b1=tree.firstKey();
+        HashMap<Bundle ,TreeMap<String,Integer>> tree=getTramites();
+        Bundle b1 = null;
+        for(Bundle bundle:tree.keySet()){
+            b1=bundle;
+        }
         TreeMap<String,Integer> tree2=tree.get(b1);
 
 
 
         for(final String s:b1.keySet()){
             Button f=findViewById(tree2.get(s));
+            final Bundle finalB = b1;
             f.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ArrayList<String> sd;
-                    sd = (ArrayList<String>) b1.get(s);
-
+                    sd = (ArrayList<String>) finalB.get(s);
                     Bundle b2=new Bundle();
+                    int t=1;
+                    for(String s2:sd){
+                        b2.putString("inst"+t,s2);
+                        t++;
+                    }
+                    b2.putString("tipo",s);
+                    Intent intent=new Intent(SeleccionTramite.this,SeleccionInstituciones.class);
+                    intent.putExtras(b2);
+                    startActivity(intent);
 
                 }
             });
